@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Guess Nationality by Name</title>
+  <style>
+    body {
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      background-color: #f4f4f4;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    input {
+      padding: 8px 12px;
+      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Guess Nationality by Name</h2>
+    <input type="text" id="nameInput" placeholder="Enter a name" />
+    <button onclick="getNationality()">Submit</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function getNationality() {
+      const name = document.getElementById("nameInput").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (!name) {
+        resultDiv.innerHTML = "Please enter a name.";
+        return;
+      }
+
+      fetch(`https://api.nationalize.io?name=${name}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.country.length === 0) {
+            resultDiv.innerHTML = `No nationality data found for "${name}".`;
+          } else {
+            let resultHTML = `<strong>Top guesses for "${name}":</strong><br>`;
+            data.country.slice(0, 3).forEach(country => {
+              resultHTML += `Country Code: <strong>${country.country_id}</strong> — Probability: <strong>${(country.probability * 100).toFixed(2)}%</strong><br>`;
+            });
+            resultDiv.innerHTML = resultHTML;
+          }
+        })
+        .catch(error => {
+          resultDiv.innerHTML = "Error fetching data.";
+          console.error("Error:", error);
+        });
+    }
+  </script>
+</body>
+</html>
